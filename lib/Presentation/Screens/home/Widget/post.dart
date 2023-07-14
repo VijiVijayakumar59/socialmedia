@@ -48,7 +48,13 @@ class PostWidget extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               subtitle: const Text("Los Angeles, California"),
-              trailing: const Icon(Icons.more_vert_rounded),
+              // trailing: IconButton(
+              //     onPressed: () {
+
+              //     },
+              //     icon: const Icon(
+              //       Icons.more_vert_rounded,
+              //     )),
             ),
             Padding(
               padding: const EdgeInsets.only(left: 8, top: 2, right: 8),

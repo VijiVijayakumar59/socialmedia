@@ -28,11 +28,7 @@ class ChatScreen extends StatelessWidget {
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.of(context).pop(
-                  // MaterialPageRoute(
-                  //   builder: (ctx) => MessageScreen(),
-                  // ),
-                  );
+              Navigator.of(context).pop();
             },
           ),
           title: Column(
@@ -85,39 +81,42 @@ class ChatScreen extends StatelessWidget {
         ),
         body: Column(
           children: [
-            ListView.builder(
-              itemCount: messages.length,
-              shrinkWrap: true,
-              padding: const EdgeInsets.only(top: 10, bottom: 10),
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Container(
-                  padding: const EdgeInsets.only(
-                      left: 14, right: 14, top: 10, bottom: 10),
-                  child: Align(
-                    alignment: (messages[index].messageType == "receiver"
-                        ? Alignment.topLeft
-                        : Alignment.topRight),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: (messages[index].messageType == "receiver"
-                            ? twhitecolor
-                            : torangecolor),
-                      ),
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        messages[index].messageContent,
-                        style: const TextStyle(fontSize: 15),
+            Expanded(
+              child: ListView.builder(
+                itemCount: messages.length,
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  return Container(
+                    padding: const EdgeInsets.only(
+                        left: 14, right: 14, top: 10, bottom: 10),
+                    child: Align(
+                      alignment: (messages[index].messageType == "receiver"
+                          ? Alignment.topLeft
+                          : Alignment.topRight),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: (messages[index].messageType == "receiver"
+                              ? twhitecolor
+                              : torangecolor),
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          messages[index].messageContent,
+                          style: const TextStyle(fontSize: 15),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
             TypingWidget(),
           ],
         ),
+        // bottomNavigationBar: TypingWidget(),
         //bottomSheet: TypingWidget(),
       ),
     );

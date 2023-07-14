@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:socialmedia/Presentation/Screens/profile/screen/followers_screen.dart';
+import 'package:socialmedia/Presentation/Screens/user/screens/user_profile.dart';
 
 class SearchScreen extends StatelessWidget {
   List<dynamic> search = [
@@ -27,7 +29,9 @@ class SearchScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
+                    
                     decoration: InputDecoration(
+                      
                       hintText: "Search Here",
                       suffixIcon: IconButton(
                         icon: const Icon(Icons.clear_rounded),
@@ -83,20 +87,29 @@ class SearchScreen extends StatelessWidget {
                               ),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Username",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 16),
-                                    ),
-                                    Text(
-                                      "name",
-                                      style: TextStyle(fontSize: 14),
-                                    ),
-                                  ],
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: ((context) =>
+                                                UserProfile())));
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: const [
+                                      Text(
+                                        "Username",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 16),
+                                      ),
+                                      Text(
+                                        "name",
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ],
