@@ -56,24 +56,11 @@ class ProfileScreen extends StatelessWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.12,
                   ),
-                  Stack(children: [
-                    const CircleAvatar(
-                      radius: 48,
-                      backgroundImage:
-                          AssetImage("assets/images/storyprofile.jpeg"),
-                    ),
-                    Positioned(
-                      bottom: -4,
-                      right: -12,
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.camera_alt,
-                          size: 25,
-                        ),
-                      ),
-                    )
-                  ]),
+                  const CircleAvatar(
+                    radius: 48,
+                    backgroundImage:
+                        AssetImage("assets/images/storyprofile.jpeg"),
+                  ),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.12,
                   ),

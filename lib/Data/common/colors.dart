@@ -6,3 +6,10 @@ final tgreycolor = Colors.grey;
 const tgrey2 = Color.fromARGB(255, 214, 206, 206);
 final tblackcolor = Colors.black;
 const torangecolor = Colors.orange;
+const kheight50 = SizedBox(
+  height: 50,
+);
+
+const kheight20 = SizedBox(
+  height: 20,
+);
