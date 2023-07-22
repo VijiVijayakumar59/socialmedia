@@ -15,33 +15,35 @@ class HomeWidget extends StatefulWidget {
 class _HomeWidgetState extends State<HomeWidget> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: const Icon(Icons.camera_alt_outlined),
-        title: const Text(
-          "Social Media",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: ((context) => ActivityScreen()),
-                ),
-              );
-            },
-            icon: const Icon(Icons.favorite_outline),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: const Icon(Icons.camera_alt_outlined),
+          title: const Text(
+            "Social Media",
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
-      body: Column(
-        children: [
-          StoryWidget(),
-          const Expanded(
-            child: PostWidget(),
-          )
-        ],
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: ((context) => const ActivityScreen()),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.favorite_outline),
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            StoryWidget(),
+            const Expanded(
+              child: PostWidget(),
+            )
+          ],
+        ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -27,6 +29,7 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String email = FirebaseAuth.instance.currentUser!.email!;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -50,42 +53,75 @@ class ProfileScreen extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.12,
-                  ),
-                  const CircleAvatar(
-                    radius: 48,
-                    backgroundImage:
-                        AssetImage("assets/images/storyprofile.jpeg"),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.12,
-                  ),
-                ],
-              ),
-              const Text(
-                "Selena Gomez",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const Text(
-                "Musician/band",
-              ),
-              Row(
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.22,
-                  ),
-                  const ProfileFollowing(value: "55", titles: "Posts"),
-                  const ProfileFollowing(value: "435", titles: "Followers"),
-                  const ProfileFollowing(value: "12", titles: "Following"),
-                ],
-              ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.04,
-              ),
+              StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('User')
+                      .where('email', isEqualTo: email)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final List<DocumentSnapshot> documents =
+                          snapshot.data!.docs;
+                      bool available = documents.isNotEmpty;
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.12,
+                              ),
+                              CircleAvatar(
+                                radius: 48,
+                                backgroundImage: NetworkImage(available
+                                    ? documents[0].get('image')
+                                    : 'https://www.cornwallbusinessawards.co.uk/wp-content/uploads/2017/11/dummy450x450.jpg'),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.12,
+                              ),
+                            ],
+                          ),
+                          Text(
+                            available ? documents[0].get('name') : "Username",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            available
+                                ? documents[0].get('profession')
+                                : "Profession",
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.22,
+                              ),
+                              ProfileFollowing(
+                                  value: available
+                                      ? documents[0].get('posts').toString()
+                                      : '0',
+                                  titles: "Posts"),
+                              ProfileFollowing(
+                                  value: available
+                                      ? documents[0].get('followers').toString()
+                                      : '0',
+                                  titles: "Followers"),
+                              ProfileFollowing(
+                                  value: available
+                                      ? documents[0].get('following').toString()
+                                      : '0',
+                                  titles: "Following"),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.04,
+                          ),
+                        ],
+                      );
+                    }
+                    return const CircularProgressIndicator();
+                  }),
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).push(MaterialPageRoute(

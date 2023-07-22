@@ -1,10 +1,14 @@
+// ignore_for_file: unrelated_type_equality_checks
+
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/authentication/screen/sign_up.dart';
+import 'package:socialmedia/Presentation/Screens/authentication/screen/widgets/reset_password.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/home.dart';
 
 import '../../../services/firebase_services.dart';
@@ -146,12 +150,21 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
-                          children: const [
-                            Text(
-                              "Forget Password",
-                              style: TextStyle(
-                                color: maincolor,
+                          children: [
+                            TextButton(
+                              child: const Text(
+                                "Forget Password",
+                                style: TextStyle(
+                                  color: maincolor,
+                                ),
                               ),
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ResetPassword(),
+                                  ),
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -162,7 +175,7 @@ class _SignInPageState extends State<SignInPage> {
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
                               log('validation success');
-                              
+
                               FirebaseAuth.instance
                                   .signInWithEmailAndPassword(
                                       email: emailController.text,
@@ -174,17 +187,27 @@ class _SignInPageState extends State<SignInPage> {
                                     MaterialPageRoute(
                                       builder: (context) => const HomeScreen(),
                                     )).onError((error, stackTrace) {});
+                              }).catchError((error) {
+                                log('on catch error');
+                                Fluttertoast.showToast(
+                                  msg: 'No such user exists',
+                                  toastLength: Toast.LENGTH_SHORT,
+                                  gravity: ToastGravity.BOTTOM,
+                                  timeInSecForIosWeb: 1,
+                                  backgroundColor: torangecolor,
+                                  textColor: Colors.white,
+                                );
                               });
                             }
                           },
                           style: ElevatedButton.styleFrom(
                             splashFactory: NoSplash.splashFactory,
+                            backgroundColor: maincolor,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(15),
                             ),
                             elevation: 0,
                             side: BorderSide(color: Colors.grey.shade300),
-                            primary: maincolor,
                             minimumSize: const Size.fromHeight(50), // NEW
                           ),
                           child: const Text(

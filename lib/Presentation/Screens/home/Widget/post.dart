@@ -10,6 +10,7 @@ class PostWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
+      physics: NeverScrollableScrollPhysics(),
       itemCount: 3,
       itemBuilder: (context, index) {
         return Column(
