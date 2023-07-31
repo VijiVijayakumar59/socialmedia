@@ -37,8 +37,10 @@ class EntryPage extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.04,
               ),
               Container(
-                height: 400,
-                width: 400,
+                // height: 400,
+                // width: 400,
+                height: MediaQuery.of(context).size.height * 0.4,
+                // width: MediaQuery.of(context).size.width * 0.4,
                 decoration: const BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage("assets/images/entrypage pic.png"))),

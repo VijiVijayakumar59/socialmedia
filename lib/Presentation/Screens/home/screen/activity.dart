@@ -42,8 +42,10 @@ class ActivityScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 18),
                   ),
                   Container(
-                    height: 54,
-                    width: 54,
+                    // height: 54,
+                    // width: 54,
+                    height: MediaQuery.of(context).size.height * 0.07,
+                    width: MediaQuery.of(context).size.width * 0.13,
                     // color: tblackcolor,
                     decoration: const BoxDecoration(
                       image: DecorationImage(

@@ -21,10 +21,11 @@ TextEditingController emailController = TextEditingController();
 TextEditingController passwordController = TextEditingController();
 TextEditingController confirmpasswordController = TextEditingController();
 
+final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
 class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
-    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
     return Scaffold(
       body: SafeArea(
         child: Container(

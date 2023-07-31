@@ -62,8 +62,10 @@ class MessageScreen extends StatelessWidget {
                         //  mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Container(
-                            width: 67,
-                            height: 67,
+                            // width: 67,
+                            // height: 67,
+                            height: MediaQuery.of(context).size.height * 0.08,
+                            width: MediaQuery.of(context).size.width * 0.18,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
                               shape: BoxShape.rectangle,
@@ -76,8 +78,11 @@ class MessageScreen extends StatelessWidget {
                             child: Padding(
                               padding: const EdgeInsets.all(4.0),
                               child: Container(
-                                width: 65,
-                                height: 65,
+                                // width: 65,
+                                // height: 65,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.08,
+                                width: MediaQuery.of(context).size.width * 0.18,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(10),
                                   shape: BoxShape.rectangle,
@@ -123,7 +128,7 @@ class MessageScreen extends StatelessWidget {
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width *
-                                        0.28,
+                                        0.16,
                                   ),
                                   const Text("15min"),
                                 ],

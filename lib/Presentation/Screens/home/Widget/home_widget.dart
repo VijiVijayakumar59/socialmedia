@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:socialmedia/Presentation/Screens/Home/Widget/post.dart';
 import 'package:socialmedia/Presentation/Screens/home/Widget/story.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/activity.dart';

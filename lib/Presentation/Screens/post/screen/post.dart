@@ -1,66 +1,146 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:socialmedia/Data/common/colors.dart';
+// import 'dart:developer';
+// import 'dart:io';
+// import 'package:flutter/material.dart';
+// import 'package:image_cropper/image_cropper.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:socialmedia/Data/common/colors.dart';
 
-class PostScreen extends StatelessWidget {
-  const PostScreen({super.key});
+// enum AppState {
+//   free,
+//   picked,
+//   cropped,
+// }
 
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () {},
-          ),
-          title: const Text(
-            "New Post",
-            style: TextStyle(fontWeight: FontWeight.w700),
-          ),
-          actions: [
-            TextButton(
-              child: Text(
-                "Next",
-                style: TextStyle(
-                  color: tblackcolor,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              onPressed: () {},
-            ),
-          ],
-        ),
-        body: Container(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 360,
-                      width: 380,
-                      color: tblackcolor,
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          "Recent",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600, fontSize: 18),
-                        ),
-                        IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.arrow_drop_down_outlined))
-                      ],
-                    ),
-                  ]),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
+// class PostScreen extends StatefulWidget {
+//   const PostScreen({super.key});
+
+//   @override
+//   State<PostScreen> createState() => _PostScreenState();
+// }
+
+// class _PostScreenState extends State<PostScreen> {
+//   late AppState state;
+//   File? imageFile;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     state = AppState.free;
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return SafeArea(
+//       child: Scaffold(
+//         appBar: AppBar(
+//           leading: IconButton(
+//             icon: const Icon(Icons.clear),
+//             onPressed: () {
+//               Navigator.of(context).pop();
+//             },
+//           ),
+//           title: const Text(
+//             "New Post",
+//             style: TextStyle(fontWeight: FontWeight.w700),
+//           ),
+//         ),
+//         // floatingActionButton: FloatingActionButton(
+//         //   backgroundColor: torangecolor,
+//         //   elevation: 0,
+//         //   onPressed: () {
+//         //     pickImage();
+//         //     // if (state == AppState.free) {
+//         //     //   pickImage();
+//         //     // } else if (state == AppState.picked) {
+//         //     //   cropImage();
+//         //     // } else if (state == AppState.cropped) {
+//         //     //   //clearImage();
+//         //     //   log("ddv");
+//         //     // }
+//         //   },
+//         //   // child: buildButtonIcon(),
+//         // ),
+//         // const Text(
+//         //   "Select Image",
+//         //   style: TextStyle(
+//         //     fontSize: 18,
+//         //     fontWeight: FontWeight.bold,
+//         //   ),
+//         // ),
+
+//         // body: Container(
+//         //   height: 50,
+//         //   width: 50,
+//         //   child: Center(
+//         //     child:
+//         //         imageFile != null ? Image.file(imageFile!) : const SizedBox(),
+//         //   ),
+//         // ),
+//       ),
+//     );
+//   }
+
+//   // Widget buildButtonIcon() {
+//   //   if (state == AppState.free) {
+//   //     return const Icon(Icons.add);
+//   //   } else if (state == AppState.picked) {
+//   //     return const Icon(Icons.crop);
+//   //   } else if (state == AppState.cropped) {
+//   //     return const Icon(Icons.clear);
+//   //   } else {
+//   //     return const SizedBox();
+//   //   }
+//   // }
+
+//   Future pickImage() async {
+//     final pickedImage = await ImagePicker().pickImage(
+//       source: ImageSource.gallery,
+//     );
+//     imageFile = pickedImage != null ? File(pickedImage.path) : null;
+//     if (imageFile != null) {
+//       setState(() {
+//         state = AppState.picked;
+//       });
+//     }
+//   }
+
+//   // Future cropImage() async {
+//   //   File? croppedFile = (await ImageCropper().cropImage(
+//   //     sourcePath: imageFile!.path,
+//   //     aspectRatioPresets: [
+//   //       CropAspectRatioPreset.square,
+//   //       CropAspectRatioPreset.ratio3x2,
+//   //       CropAspectRatioPreset.original,
+//   //       CropAspectRatioPreset.ratio4x3,
+//   //       CropAspectRatioPreset.ratio16x9
+//   //     ],
+//   //     uiSettings: [
+//   //       AndroidUiSettings(
+//   //           toolbarTitle: 'Cropper',
+//   //           toolbarColor: Colors.deepOrange,
+//   //           toolbarWidgetColor: Colors.white,
+//   //           initAspectRatio: CropAspectRatioPreset.original,
+//   //           lockAspectRatio: false),
+//   //       IOSUiSettings(
+//   //         title: 'Cropper',
+//   //       ),
+//   //       WebUiSettings(
+//   //         context: context,
+//   //       ),
+//   //     ],
+//   //   )) as File?;
+//   //   if (croppedFile != null) {
+//   //     setState(() {
+//   //       state = AppState.cropped;
+//   //       imageFile = croppedFile;
+//   //     });
+//   //   }
+//   // }
+
+//   // void clearImage() {
+//   //   imageFile = null;
+//   //   setState(() {
+//   //     state = AppState.free;
+//   //   });
+//   // }
+// }

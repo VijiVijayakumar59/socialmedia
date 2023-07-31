@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/activity.dart';
+import 'package:socialmedia/Presentation/Screens/post/widget/post_details.dart';
 import 'Presentation/Screens/authentication/screen/sign_in.dart';
 import 'Presentation/Screens/home/screen/home.dart';
 import 'Presentation/Screens/profile/screen/edit_profile_screen.dart';

@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:socialmedia/Data/models/profile.dart';
+import 'package:socialmedia/Data/models/profile_model.dart';
 import '../widgets/edit_widget.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -166,25 +166,25 @@ class _EditProfileState extends State<EditProfile> {
                   Navigator.of(context).pop();
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Camera'),
-                onTap: () async {
-                  final pickedFile =
-                      await ImagePicker().pickImage(source: ImageSource.camera);
+              // ListTile(
+              //   leading: const Icon(Icons.photo_camera),
+              //   title: const Text('Camera'),
+              //   onTap: () async {
+              //     final pickedFile =
+              //         await ImagePicker().pickImage(source: ImageSource.camera);
 
-                  if (pickedFile == null) {
-                    return;
-                  } else {
-                    File file = File(pickedFile.path);
-                    image = await _uploadImage(file);
-                    setState(() {});
-                  }
+              //     if (pickedFile == null) {
+              //       return;
+              //     } else {
+              //       File file = File(pickedFile.path);
+              //       image = await _uploadImage(file);
+              //       setState(() {});
+              //     }
 
-                  // ignore: use_build_context_synchronously
-                  Navigator.of(context).pop();
-                },
-              ),
+              //     // ignore: use_build_context_synchronously
+              //     Navigator.of(context).pop();
+              //   },
+              // ),
             ],
           ),
         );
