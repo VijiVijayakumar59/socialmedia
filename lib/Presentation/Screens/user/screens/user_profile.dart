@@ -1,30 +1,87 @@
 // ignore_for_file: sort_child_properties_last
 
+import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:socialmedia/Data/common/colors.dart';
-
-import '../../profile/screen/profile.dart';
 import '../../profile/widgets/profile_values.dart';
 
 class UserProfile extends StatefulWidget {
-  const UserProfile({super.key});
+  const UserProfile(
+      {super.key,
+      required this.name,
+      required this.image,
+      required this.profession,
+      required this.followers,
+      required this.following,
+      required this.email,
+      required this.id,
+      required this.posts});
+  final String name;
+  final String image;
+  final String profession;
+  final int posts;
+  final int followers;
+  final int following;
+  final String email;
+  final String id;
 
   @override
   State<UserProfile> createState() => _UserProfileState();
 }
 
 class _UserProfileState extends State<UserProfile> {
-  String buttonText = 'Follow';
+  bool isFollowing = false;
 
-  void changeButtonText() {
-    setState(() {
-      buttonText = 'Following';
-    });
+  void toggleFollow() async {
+    String currentEmail = FirebaseAuth.instance.currentUser!.email!;
+    final CollectionReference collection =
+        FirebaseFirestore.instance.collection('User');
+
+    QuerySnapshot querySnapshotUser =
+        await collection.where('email', isEqualTo: widget.email).get();
+    QuerySnapshot querySnapshotCurrent =
+        await collection.where('email', isEqualTo: currentEmail).get();
+
+    if (querySnapshotUser.docs.isNotEmpty &&
+        querySnapshotCurrent.docs.isNotEmpty) {
+      DocumentSnapshot userDocument = querySnapshotUser.docs.first;
+      DocumentSnapshot currentDocument = querySnapshotCurrent.docs.first;
+
+      int followersCount = userDocument.get('followers') ?? 0;
+      int followingCount = currentDocument.get('following') ?? 0;
+
+      if (isFollowing) {
+        // Unfollow the user.
+        int newFollowersCount = followersCount - 1;
+        int newFollowingCount = followingCount - 1;
+
+        await userDocument.reference.update({'followers': newFollowersCount});
+        await currentDocument.reference
+            .update({'following': newFollowingCount});
+      } else {
+        // Follow the user.
+        int newFollowersCount = followersCount + 1;
+        int newFollowingCount = followingCount + 1;
+
+        await userDocument.reference.update({'followers': newFollowersCount});
+        await currentDocument.reference
+            .update({'following': newFollowingCount});
+      }
+
+      setState(() {
+        isFollowing = !isFollowing;
+      });
+    }
+
+    log("its working");
   }
 
   @override
   Widget build(BuildContext context) {
+    String email = FirebaseAuth.instance.currentUser!.email!;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -34,9 +91,9 @@ class _UserProfileState extends State<UserProfile> {
               Navigator.of(context).pop();
             },
           ),
-          title: const Text(
-            "Username",
-            style: TextStyle(fontWeight: FontWeight.bold),
+          title: Text(
+            widget.name,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
         body: Column(
@@ -76,9 +133,9 @@ class _UserProfileState extends State<UserProfile> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           shape: BoxShape.rectangle,
-                          image: const DecorationImage(
+                          image: DecorationImage(
                             fit: BoxFit.cover,
-                            image: AssetImage('assets/images/user.jpg'),
+                            image: NetworkImage(widget.image),
                           ),
                         ),
                       ),
@@ -87,36 +144,39 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ],
             ),
-            const Text(
-              "Username",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+            Text(
+              widget.name,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ProfileFollowing(value: "55", titles: "Posts"),
-                ProfileFollowing(value: "4M", titles: "Followers"),
-                ProfileFollowing(value: "12", titles: "Following"),
+                ProfileFollowing(
+                    value: widget.posts.toString(), titles: "Posts"),
+                ProfileFollowing(
+                    value: widget.followers.toString(), titles: "Followers"),
+                ProfileFollowing(
+                    value: widget.following.toString(), titles: "Following"),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    changeButtonText();
-                  },
+                  onPressed: toggleFollow,
                   style: ElevatedButton.styleFrom(
                     splashFactory: NoSplash.splashFactory,
+                    backgroundColor: torangecolor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 0,
-                    side: BorderSide(color: Colors.grey.shade300),
-                    primary: torangecolor,
+                    side: BorderSide(
+                      color: Colors.grey.shade300,
+                    ),
                   ),
                   child: Text(
-                    buttonText,
+                    isFollowing ? 'Following' : 'Follow',
                     style: const TextStyle(
                       color: twhitecolor,
                       fontSize: 22,
@@ -133,33 +193,46 @@ class _UserProfileState extends State<UserProfile> {
                 ),
               ],
             ),
-            // CircleAvatar(
-            //   radius: 22,
-            //   backgroundImage: AssetImage("assets/images/grid2.jpg"),
-            // ),
-            Expanded(
-              child: GridView.builder(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                ),
-                itemCount: imageUrls.length,
-                itemBuilder: (ctx, index) {
-                  return GestureDetector(
-                    onTap: () {},
-                    child: Container(
-                      child: Image.asset(
-                        imageUrls[index],
-                        fit: BoxFit.cover,
+            StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('Posts')
+                    .where('email', isEqualTo: widget.email)
+                    .where('email', isNotEqualTo: email)
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    final List<DocumentSnapshot> documents =
+                        snapshot.data!.docs;
+
+                    return Expanded(
+                      child: GridView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+
+                        itemCount: documents
+                            .length, // Replace with your desired number of images
+                        itemBuilder: (ctx, index) {
+                          return GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              child: Image.network(
+                                documents[index].get('postImage'),
+                                fit: BoxFit.cover,
+                              ),
+                              color: Colors.grey,
+                            ),
+                          );
+                        },
                       ),
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-              ),
-            ),
+                    );
+                  }
+                  return const CircularProgressIndicator();
+                }),
           ],
         ),
       ),

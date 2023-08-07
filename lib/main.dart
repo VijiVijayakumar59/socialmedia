@@ -1,9 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/activity.dart';
 import 'package:socialmedia/Presentation/Screens/post/widget/post_details.dart';
+import 'package:socialmedia/provider/follow_state.dart';
 import 'Presentation/Screens/authentication/screen/sign_in.dart';
 import 'Presentation/Screens/home/screen/home.dart';
 import 'Presentation/Screens/profile/screen/edit_profile_screen.dart';
@@ -27,27 +29,34 @@ class SocialMedia extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primaryColor: Colors.orange,
-        fontFamily: "Nunito",
-        primarySwatch:
-            MaterialColor((const Color.fromARGB(235, 243, 192, 116).value), {
-          50: Colors.orange.withOpacity(0.05),
-          100: Colors.orange.withOpacity(0.1),
-          200: Colors.orange.withOpacity(0.2),
-          300: Colors.orange.withOpacity(0.3),
-          400: const Color.fromARGB(255, 220, 145, 32).withOpacity(0.4),
-          500: Colors.orange.withOpacity(0.5),
-          600: Colors.orange.withOpacity(0.6),
-          700: Colors.orange.withOpacity(0.7),
-          800: Colors.orange.withOpacity(0.8),
-          900: Colors.orange.withOpacity(0.9),
-        }),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<FollowState>(
+          create: (context) => FollowState(),
+        )
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primaryColor: Colors.orange,
+          fontFamily: "Nunito",
+          primarySwatch:
+              MaterialColor((const Color.fromARGB(235, 243, 192, 116).value), {
+            50: Colors.orange.withOpacity(0.05),
+            100: Colors.orange.withOpacity(0.1),
+            200: Colors.orange.withOpacity(0.2),
+            300: Colors.orange.withOpacity(0.3),
+            400: const Color.fromARGB(255, 220, 145, 32).withOpacity(0.4),
+            500: Colors.orange.withOpacity(0.5),
+            600: Colors.orange.withOpacity(0.6),
+            700: Colors.orange.withOpacity(0.7),
+            800: Colors.orange.withOpacity(0.8),
+            900: Colors.orange.withOpacity(0.9),
+          }),
+        ),
+        home: const SplashScreen(),
       ),
-      home: const SplashScreen(),
     );
   }
 }

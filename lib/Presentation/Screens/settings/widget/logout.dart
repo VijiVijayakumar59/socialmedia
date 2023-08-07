@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +20,7 @@ void showLogoutAlertDialog(BuildContext context) {
         content: const Text('Are you sure you want to log out?'),
         actions: <Widget>[
           TextButton(
-            child: const Text(
-              'Cancel'),
+            child: const Text('Cancel'),
             onPressed: () {},
           ),
           TextButton(

@@ -1,11 +1,10 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 
 import '../widget/chat_model.dart';
 import '../widget/typing_widget.dart';
-import 'message.dart';
 
 class ChatScreen extends StatelessWidget {
   List<ChatMessage> messages = [
@@ -26,7 +25,7 @@ class ChatScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: const Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.of(context).pop();
             },

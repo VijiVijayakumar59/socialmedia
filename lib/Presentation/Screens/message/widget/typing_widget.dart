@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -5,7 +7,9 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import '../../../../Data/common/colors.dart';
 
 class TypingWidget extends StatelessWidget {
-  const TypingWidget({super.key});
+  TypingWidget({super.key});
+
+  TextEditingController _message = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +41,9 @@ class TypingWidget extends StatelessWidget {
             const SizedBox(
               width: 15,
             ),
-            const Expanded(
+            Expanded(
               child: TextField(
+                controller: _message,
                 decoration: InputDecoration(
                     hintText: "Write message...",
                     hintStyle: TextStyle(color: Colors.black54),
@@ -49,7 +54,11 @@ class TypingWidget extends StatelessWidget {
               width: 15,
             ),
             FloatingActionButton(
-              onPressed: () {},
+              onPressed: () async {
+                String message = _message.text;
+                _message.clear();
+                // await FirebaseFirestore.instance.collection('User').doc(currentId).collection('messages').doc(widget.friend)
+              },
               child: const Icon(
                 Icons.send,
                 color: twhitecolor,

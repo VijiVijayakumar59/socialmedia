@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'dart:developer';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +9,8 @@ import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Data/models/post_model.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/home.dart';
 
-final FirebaseFirestore firestore = FirebaseFirestore.instance;
-final CollectionReference postsCollection = firestore.collection('Posts');
+// final FirebaseFirestore firestore = FirebaseFirestore.instance;
+// final CollectionReference postsCollection = firestore.collection('Posts');
 
 class PostDetails extends StatefulWidget {
   const PostDetails({super.key, required this.imageUrl});
@@ -20,6 +20,8 @@ class PostDetails extends StatefulWidget {
   State<PostDetails> createState() => _PostDetailsState();
 }
 
+// late String userName;
+
 TextEditingController captionController = TextEditingController();
 TextEditingController locationController = TextEditingController();
 TextEditingController usernameController = TextEditingController();
@@ -28,6 +30,28 @@ TextEditingController postIdController = TextEditingController();
 TextEditingController commentController = TextEditingController();
 
 class _PostDetailsState extends State<PostDetails> {
+  @override
+  void initState() {
+    getDataFromFirestore();
+    super.initState();
+  }
+
+  Future<void> getDataFromFirestore() async {
+    String? emailId = FirebaseAuth.instance.currentUser?.email;
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('User')
+        .where('email', isEqualTo: emailId)
+        .get();
+
+    var name = querySnapshot.docs[0].get('name');
+    log('Name: $name');
+    setState(() {
+      userName = name;
+    });
+    return name;
+  }
+
+  String userName = '';
   final postKey = GlobalKey<FormState>();
   String? postImage;
   @override
@@ -56,13 +80,14 @@ class _PostDetailsState extends State<PostDetails> {
                   Posts data = Posts(
                     // comments: int.parse(commentController.text.trim()),
                     location: locationController.text.trim(),
-                    username: usernameController.text.trim(),
+                    username: userName,
                     description: captionController.text.trim(),
                     email: emailController.text.trim(),
                     postId: postIdController.text.trim(),
-                    postImage: postImage,
+                    postImage: widget.imageUrl,
                   );
                   await addPosts(data, context);
+                  print(widget.imageUrl);
                 }
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -159,13 +184,29 @@ Future<void> addPosts(Posts postsModel, BuildContext context) async {
       'email': email,
       'likes': 0,
       'location': postsModel.location,
-      'postId': postsModel.postId,
+      'postId': reference,
       'postImage': postsModel.postImage,
       'username': postsModel.username,
-    }).then((value) {
+    }).then((value) async {
+      await updatePostValueIfEmailMatches(email);
       Navigator.of(context).pop();
     });
   } catch (error) {
     log("Failed to add post: $error");
+  }
+}
+
+Future<void> updatePostValueIfEmailMatches(String currentEmail) async {
+  final CollectionReference collection =
+      FirebaseFirestore.instance.collection('User');
+
+  QuerySnapshot querySnapshot =
+      await collection.where('email', isEqualTo: currentEmail).get();
+
+  if (querySnapshot.docs.isNotEmpty) {
+    DocumentSnapshot documentSnapshot = querySnapshot.docs.first;
+    int currentPostValue = documentSnapshot.get('posts') ?? 0;
+    int newPostValue = currentPostValue + 1;
+    await documentSnapshot.reference.update({'posts': newPostValue});
   }
 }

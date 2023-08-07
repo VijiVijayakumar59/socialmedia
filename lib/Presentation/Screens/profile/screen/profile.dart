@@ -1,9 +1,11 @@
+// ignore_for_file: sort_child_properties_last
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:socialmedia/Data/common/colors.dart';
+import 'package:socialmedia/Presentation/Screens/profile/screen/followers_screen.dart';
+import 'package:socialmedia/Presentation/Screens/profile/screen/following_screen.dart';
 
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/profile_values.dart';
@@ -62,6 +64,7 @@ class ProfileScreen extends StatelessWidget {
                     if (snapshot.hasData) {
                       final List<DocumentSnapshot> documents =
                           snapshot.data!.docs;
+
                       bool available = documents.isNotEmpty;
                       return Column(
                         children: [
@@ -102,16 +105,34 @@ class ProfileScreen extends StatelessWidget {
                                       ? documents[0].get('posts').toString()
                                       : '0',
                                   titles: "Posts"),
-                              ProfileFollowing(
-                                  value: available
-                                      ? documents[0].get('followers').toString()
-                                      : '0',
-                                  titles: "Followers"),
-                              ProfileFollowing(
-                                  value: available
-                                      ? documents[0].get('following').toString()
-                                      : '0',
-                                  titles: "Following"),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => FollowersScreen(),
+                                  ));
+                                },
+                                child: ProfileFollowing(
+                                    value: available
+                                        ? documents[0]
+                                            .get('followers')
+                                            .toString()
+                                        : '0',
+                                    titles: "Followers"),
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => FollowingScreen(),
+                                  ));
+                                },
+                                child: ProfileFollowing(
+                                    value: available
+                                        ? documents[0]
+                                            .get('following')
+                                            .toString()
+                                        : '0',
+                                    titles: "Following"),
+                              ),
                             ],
                           ),
                           SizedBox(
@@ -150,31 +171,51 @@ class ProfileScreen extends StatelessWidget {
                 radius: 22,
                 backgroundImage: AssetImage("assets/images/grid2.jpg"),
               ),
-              Expanded(
-                child: GridView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
-                  ),
-                  itemCount: imageUrls
-                      .length, // Replace with your desired number of images
-                  itemBuilder: (ctx, index) {
-                    return GestureDetector(
-                      onTap: () {},
-                      child: Container(
-                        // ignore: sort_child_properties_last
-                        child: Image.asset(
-                          imageUrls[index],
-                          fit: BoxFit.cover,
+              StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Posts')
+                      .where('email', isEqualTo: email)
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      final List<DocumentSnapshot> documents =
+                          snapshot.data!.docs;
+
+                      return Expanded(
+                        child: GridView.builder(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 10,
+                            mainAxisSpacing: 10,
+                          ),
+
+                          itemCount: documents
+                              .length, // Replace with your desired number of images
+                          itemBuilder: (ctx, index) {
+                            return GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                // ignore: sort_child_properties_last
+                                // child: Image.asset(
+                                //   imageUrls[index],
+                                //   fit: BoxFit.cover,
+                                // ),
+                                child: Image.network(
+                                  documents[index].get('postImage'),
+                                  fit: BoxFit.cover,
+                                ),
+
+                                color: Colors.grey,
+                              ),
+                            );
+                          },
                         ),
-                        color: Colors.grey, // Replace with your image logic
-                      ),
-                    );
-                  },
-                ),
-              ),
+                      );
+                    }
+                    return CircularProgressIndicator();
+                  }),
             ],
           ),
         ),

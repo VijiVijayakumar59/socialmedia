@@ -2,19 +2,21 @@
 
 import 'dart:developer';
 import 'dart:io';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pandabar/main.view.dart';
 import 'package:pandabar/model.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/post/screen/image_preview_screen.dart';
-
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import '../../message/screen/message.dart';
 import '../../profile/screen/profile.dart';
 import '../../search/screen/search.dart';
 import '../Widget/home_widget.dart';
+
+final FirebaseFirestore firestore = FirebaseFirestore.instance;
+final CollectionReference postsCollection = firestore.collection('Posts');
 
 // ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
@@ -60,9 +62,11 @@ class _HomeScreenState extends State<HomeScreen> {
               if (image != null) {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                      builder: ((context) => ImagePreviewScreen(
-                            imageUrl: image!,
-                          ))),
+                    builder: ((context) => ImagePreviewScreen(
+                      
+                          imageUrl: image!,
+                        )),
+                  ),
                 );
               }
             },
@@ -121,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
         firebase_storage.FirebaseStorage.instance;
     DateTime now = DateTime.now();
     String timestamp = now.microsecondsSinceEpoch.toString();
-    firebase_storage.Reference ref = storage.ref().child('posts/$timestamp');
+    firebase_storage.Reference ref = storage.ref().child('Posts/$timestamp');
     firebase_storage.UploadTask task = ref.putFile(file);
     await task;
     String downloadURL = await ref.getDownloadURL();
