@@ -1,20 +1,12 @@
 import 'package:flutter/material.dart';
 
-// FollowState.dart
-
 class FollowState extends ChangeNotifier {
-  Map<String, bool> _followStatus = {};
+  bool _isFollowing = false;
 
-  bool isFollowing(String userId) {
-    return _followStatus[userId] ?? false;
-  }
+  bool get isFollowing => _isFollowing;
 
-  void toggleFollow(String userId) {
-    if (_followStatus.containsKey(userId)) {
-      _followStatus[userId] = !_followStatus[userId]!;
-    } else {
-      _followStatus[userId] = true;
-    }
+  void setFollowingState(bool status) {
+    _isFollowing = status;
     notifyListeners();
   }
 }

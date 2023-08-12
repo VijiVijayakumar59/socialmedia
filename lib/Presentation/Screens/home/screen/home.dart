@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
             case 'Grey':
               return const HomeWidget();
             case 'Blue':
-              return SearchScreen();
+              return const SearchScreen();
 
             case 'Red':
               return MessageScreen();

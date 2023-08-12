@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_declarations
+
 import 'package:flutter/material.dart';
 
 const maincolor = Color.fromARGB(255, 223, 121, 32);

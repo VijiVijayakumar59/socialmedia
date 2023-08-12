@@ -78,16 +78,17 @@ class _PostDetailsState extends State<PostDetails> {
               onPressed: () async {
                 if (postKey.currentState!.validate()) {
                   Posts data = Posts(
-                    // comments: int.parse(commentController.text.trim()),
                     location: locationController.text.trim(),
                     username: userName,
                     description: captionController.text.trim(),
                     email: emailController.text.trim(),
                     postId: postIdController.text.trim(),
                     postImage: widget.imageUrl,
+                    likedBy: [],
+                    likes: 0,
                   );
                   await addPosts(data, context);
-                  print(widget.imageUrl);
+                  log(widget.imageUrl);
                 }
                 Navigator.of(context).push(
                   MaterialPageRoute(
@@ -179,7 +180,7 @@ Future<void> addPosts(Posts postsModel, BuildContext context) async {
   final String email = FirebaseAuth.instance.currentUser!.email!;
   try {
     await reference.set({
-      'comments': postsModel.comments,
+      'likedBy': postsModel.likedBy,
       'description': postsModel.description,
       'email': email,
       'likes': 0,

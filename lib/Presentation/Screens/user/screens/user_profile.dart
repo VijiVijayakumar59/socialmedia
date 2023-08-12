@@ -1,24 +1,26 @@
-// ignore_for_file: sort_child_properties_last
-
+// ignore_for_file: sort_child_properties_last, use_build_context_synchronously
 import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:socialmedia/Data/common/colors.dart';
+import 'package:socialmedia/provider/follow_state.dart';
 import '../../profile/widgets/profile_values.dart';
 
 class UserProfile extends StatefulWidget {
-  const UserProfile(
-      {super.key,
-      required this.name,
-      required this.image,
-      required this.profession,
-      required this.followers,
-      required this.following,
-      required this.email,
-      required this.id,
-      required this.posts});
+  const UserProfile({
+    super.key,
+    required this.name,
+    required this.image,
+    required this.profession,
+    required this.followers,
+    required this.following,
+    required this.email,
+    required this.id,
+    required this.posts,
+  });
   final String name;
   final String image;
   final String profession;
@@ -33,8 +35,6 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
-  bool isFollowing = false;
-
   void toggleFollow() async {
     String currentEmail = FirebaseAuth.instance.currentUser!.email!;
     final CollectionReference collection =
@@ -52,8 +52,9 @@ class _UserProfileState extends State<UserProfile> {
 
       int followersCount = userDocument.get('followers') ?? 0;
       int followingCount = currentDocument.get('following') ?? 0;
-
-      if (isFollowing) {
+      FollowState followState =
+          Provider.of<FollowState>(context, listen: false);
+      if (followState.isFollowing) {
         // Unfollow the user.
         int newFollowersCount = followersCount - 1;
         int newFollowingCount = followingCount - 1;
@@ -70,10 +71,7 @@ class _UserProfileState extends State<UserProfile> {
         await currentDocument.reference
             .update({'following': newFollowingCount});
       }
-
-      setState(() {
-        isFollowing = !isFollowing;
-      });
+      followState.setFollowingState(!followState.isFollowing);
     }
 
     log("its working");
@@ -162,27 +160,31 @@ class _UserProfileState extends State<UserProfile> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton(
-                  onPressed: toggleFollow,
-                  style: ElevatedButton.styleFrom(
-                    splashFactory: NoSplash.splashFactory,
-                    backgroundColor: torangecolor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 0,
-                    side: BorderSide(
-                      color: Colors.grey.shade300,
-                    ),
-                  ),
-                  child: Text(
-                    isFollowing ? 'Following' : 'Follow',
-                    style: const TextStyle(
-                      color: twhitecolor,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
+                Consumer<FollowState>(
+                  builder: (context, followState, _) {
+                    return ElevatedButton(
+                      onPressed: toggleFollow,
+                      style: ElevatedButton.styleFrom(
+                        splashFactory: NoSplash.splashFactory,
+                        backgroundColor: torangecolor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        side: BorderSide(
+                          color: Colors.grey.shade300,
+                        ),
+                      ),
+                      child: Text(
+                        followState.isFollowing ? 'Following' : 'Follow',
+                        style: const TextStyle(
+                          color: twhitecolor,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    );
+                  },
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),

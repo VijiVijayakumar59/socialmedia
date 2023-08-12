@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/profile/screen/followers_screen.dart';
 import 'package:socialmedia/Presentation/Screens/profile/screen/following_screen.dart';
+import 'package:socialmedia/Presentation/Screens/search/screen/search.dart';
 
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/profile_values.dart';
@@ -64,7 +65,7 @@ class ProfileScreen extends StatelessWidget {
                     if (snapshot.hasData) {
                       final List<DocumentSnapshot> documents =
                           snapshot.data!.docs;
-
+                      // final DocumentSnapshot userSnap = filteredUser[0];
                       bool available = documents.isNotEmpty;
                       return Column(
                         children: [
@@ -122,7 +123,18 @@ class ProfileScreen extends StatelessWidget {
                               InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => FollowingScreen(),
+                                    builder: (context) => FollowingScreen(
+                                      name: documents[0].get('name').toString(),
+                                      image:
+                                          documents[0].get('image').toString(),
+                                      profession: documents[0]
+                                          .get('profession')
+                                          .toString(),
+                                      followers: documents[0].get('followers'),
+                                      following: documents[0].get('following'),
+                                      email: email,
+                                      id: documents[0].get('id').toString(),
+                                    ),
                                   ));
                                 },
                                 child: ProfileFollowing(

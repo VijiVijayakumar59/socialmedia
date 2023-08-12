@@ -1,6 +1,6 @@
+// ignore_for_file: unused_local_variable, avoid_print
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 
 import '../../../../Data/common/colors.dart';
 
@@ -14,7 +14,23 @@ List<dynamic> Following = [
 ];
 
 class FollowingScreen extends StatefulWidget {
-  const FollowingScreen({super.key});
+  final String name;
+  final String image;
+  final String profession;
+  final int followers;
+  final int following;
+  final String email;
+  final String id;
+  const FollowingScreen({
+    super.key,
+    required this.name,
+    required this.image,
+    required this.profession,
+    required this.followers,
+    required this.following,
+    required this.email,
+    required this.id,
+  });
 
   @override
   State<FollowingScreen> createState() => _FollowingScreenState();
@@ -31,6 +47,7 @@ class _FollowingScreenState extends State<FollowingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    String email = FirebaseAuth.instance.currentUser!.email!;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -49,80 +66,85 @@ class _FollowingScreenState extends State<FollowingScreen> {
           ),
         ),
         body: Column(
-            children: List.generate(Following.length, (index) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Column(children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Container(
-                    width: 67,
-                    height: 67,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      shape: BoxShape.rectangle,
-                      gradient: const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Colors.red, Colors.yellow],
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
-                        width: 65,
-                        height: 65,
+          children: List.generate(
+            Following.length,
+            (index) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Column(children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        width: 67,
+                        height: 67,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(10),
                           shape: BoxShape.rectangle,
-                          image: const DecorationImage(
-                            fit: BoxFit.fill,
-                            image:
-                                AssetImage('assets/images/storyprofile.jpeg'),
+                          gradient: const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Colors.red, Colors.yellow],
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Container(
+                            width: 65,
+                            height: 65,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              shape: BoxShape.rectangle,
+                              image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image: NetworkImage(widget.image),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        "Username",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600, fontSize: 20),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.name,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 20),
+                          ),
+                          Text(widget.profession),
+                        ],
                       ),
-                      Text("Name"),
+                      ElevatedButton(
+                        onPressed: () {
+                          changeButtonText();
+                          // print(widget.name);
+                          // print(widget.email);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          splashFactory: NoSplash.splashFactory,
+                          backgroundColor: torangecolor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        child: Text(
+                          buttonText,
+                          style: const TextStyle(
+                            color: twhitecolor,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ],
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      changeButtonText();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      splashFactory: NoSplash.splashFactory,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                      side: BorderSide(color: Colors.grey.shade300),
-                      primary: torangecolor,
-                    ),
-                    child: Text(
-                      buttonText,
-                      style: const TextStyle(
-                        color: twhitecolor,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            ]),
-          );
-        })),
+                  )
+                ]),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
