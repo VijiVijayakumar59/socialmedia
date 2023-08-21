@@ -1,9 +1,9 @@
-import 'dart:developer';
+// ignore_for_file: unused_local_variable
 
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import '../../user/screens/user_profile.dart';
 
 List<dynamic> availableUser = [];
@@ -54,24 +54,23 @@ class _SearchScreenState extends State<SearchScreen> {
               Expanded(
                 child: StreamBuilder(
                     stream: FirebaseFirestore.instance
-                        .collection('User')
-                        .where('email', isNotEqualTo: email)
+                        .collection('Users')
+                        .where('name', isEqualTo: searchController.text.trim())
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasData) {
-                        log('Data received');
-                        availableUser = snapshot.data!.docs;
+                        final data = snapshot.data?.docs;
+                        log('Data received:$data');
 
-                        return filteredUser.isEmpty
+                        return data!.isEmpty
                             ? const Center(child: Text("User not found"))
                             : ListView.builder(
                                 //  physics: const NeverScrollableScrollPhysics(),
-                                itemCount: filteredUser.length,
+                                itemCount: data.length,
                                 itemBuilder: (context, index) {
-                                  final DocumentSnapshot userSnap =
-                                      filteredUser[index];
+                                  final DocumentSnapshot userSnap = data[index];
                                   return Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Row(

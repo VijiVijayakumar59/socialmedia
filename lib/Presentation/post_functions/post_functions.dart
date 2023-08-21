@@ -77,11 +77,5 @@ void saveCommentToFirebase(String text, String postId) async {
       'userId': userId,
       'timestamp': FieldValue.serverTimestamp(),
     });
-
-    // You might also want to update the comment count in the main post document
-    // For example:
-    // FirebaseFirestore.instance.collection('Posts').doc(postId).update({
-    //   'commentCount': FieldValue.increment(1),
-    // });
   }
 }

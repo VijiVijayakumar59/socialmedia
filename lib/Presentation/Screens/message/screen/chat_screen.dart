@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:socialmedia/Data/common/colors.dart';
-
 import '../widget/chat_model.dart';
 import '../widget/typing_widget.dart';
 

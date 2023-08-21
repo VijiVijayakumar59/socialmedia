@@ -1,16 +1,12 @@
 // ignore_for_file: unrelated_type_equality_checks
-
 import 'dart:developer';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/authentication/screen/sign_up.dart';
 import 'package:socialmedia/Presentation/Screens/authentication/screen/widgets/reset_password.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/home.dart';
-
 import '../../../services/firebase_services.dart';
 
 class SignInPage extends StatefulWidget {
@@ -182,6 +178,8 @@ class _SignInPageState extends State<SignInPage> {
                                       password: passwordController.text)
                                   .then((value) {
                                 log('Login success');
+                                emailController.clear();
+                                passwordController.clear();
                                 Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(

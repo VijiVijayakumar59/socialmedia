@@ -1,12 +1,11 @@
-// ignore_for_file: deprecated_member_use
-
+// ignore_for_file: deprecated_member_use, avoid_print
 import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialmedia/Presentation/Screens/authentication/screen/sign_in.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/home.dart';
+import 'package:socialmedia/Presentation/Screens/profile/screen/edit_profile_screen.dart';
 import 'package:socialmedia/Presentation/services/firebase_services.dart';
-
 import '../../../../Data/common/colors.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -39,7 +38,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 child: Column(
                   children: [
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.09,
+                      height: MediaQuery.of(context).size.height * 0.04,
                     ),
                     const Text(
                       "Sign up now",
@@ -61,33 +60,6 @@ class _SignUpPageState extends State<SignUpPage> {
                           fontWeight: FontWeight.w500),
                     ),
                     kheight50,
-                    TextFormField(
-                      controller: nameController,
-                      validator: (value) {
-                        if (value!.isEmpty || value.length < 4) {
-                          return "Enter Valid Name";
-                        } else {
-                          return null;
-                        }
-                      },
-                      cursorColor: Colors.black,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.person,
-                          color: tgreycolor,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: const BorderSide(color: maincolor),
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-
-                        hintText: 'Username',
-                        filled: true,
-                        fillColor: twhitecolor,
-                        isDense: true, // Added this
-                        contentPadding: const EdgeInsets.all(18),
-                      ),
-                    ),
                     kheight20,
                     TextFormField(
                       controller: emailController,
@@ -112,7 +84,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           borderRadius: BorderRadius.circular(15.0),
                         ),
 
-                        hintText: 'Email/phone',
+                        hintText: 'Email',
                         filled: true,
                         fillColor: twhitecolor,
                         isDense: true, // Added this
@@ -183,7 +155,6 @@ class _SignUpPageState extends State<SignUpPage> {
                           Icons.visibility_off,
                           color: tgreycolor,
                         ),
-
                         hintText: 'Confirm Password',
                         filled: true,
                         fillColor: twhitecolor,
@@ -194,28 +165,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     kheight50,
                     ElevatedButton(
                       onPressed: () {
-                        try {
-                          if (formKey.currentState!.validate()) {
-                            formKey.currentState!.save();
-                            log('validation success');
-                            FirebaseAuth.instance
-                                .createUserWithEmailAndPassword(
-                                    email: emailController.text,
-                                    password: confirmpasswordController.text)
-                                .then((value) {
-                              log('sign up success');
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const HomeScreen(),
-                                  ));
-                            }).onError((error, stackTrace) {
-                              log('Error ${error.toString()}');
-                            });
-                          }
-                        } catch (e) {
-                          log('Exception caught: ${e.toString()}');
-                        }
+                        _signUpUser(
+                            email: emailController.text,
+                            password: passwordController.text,
+                            confirmPassword: confirmpasswordController.text);
                       },
                       style: ElevatedButton.styleFrom(
                         splashFactory: NoSplash.splashFactory,
@@ -243,7 +196,7 @@ class _SignUpPageState extends State<SignUpPage> {
                           height: 60,
                           thickness: 2,
                           indent: 0,
-                          endIndent: 140,
+                          endIndent: 120,
                         ),
                         Text(
                           "Or connect with",
@@ -255,13 +208,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           color: Colors.white,
                           height: 30,
                           thickness: 2,
-                          indent: 120,
+                          indent: 40,
                           endIndent: 0,
                         ),
                       ],
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.01,
+                      height: MediaQuery.of(context).size.height * 0.001,
                     ),
                     InkWell(
                       onTap: () async {
@@ -272,22 +225,25 @@ class _SignUpPageState extends State<SignUpPage> {
                         if (credential != null) {
                           // ignore: use_build_context_synchronously
                           Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
-                              ));
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomeScreen(),
+                            ),
+                          );
                         }
                       },
                       child: Container(
                         height: 40,
                         width: 40,
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: twhitecolor,
-                            ),
-                            image: const DecorationImage(
-                                image: AssetImage('assets/images/google.png'))),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: twhitecolor,
+                          ),
+                          image: const DecorationImage(
+                            image: AssetImage('assets/images/google.png'),
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -302,8 +258,11 @@ class _SignUpPageState extends State<SignUpPage> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: ((context) => const SignInPage())));
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: ((context) => const SignInPage()),
+                              ),
+                            );
                           },
                           child: const Text(
                             "Sign in",
@@ -320,5 +279,37 @@ class _SignUpPageState extends State<SignUpPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _signUpUser(
+      {required String email,
+      required String password,
+      required String confirmPassword}) async {
+    try {
+      if (formKey.currentState!.validate()) {
+        formKey.currentState!.save();
+        log('validation success');
+        await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        )
+            .then((userCred) {
+          log('sign up success');
+          emailController.clear();
+          confirmpasswordController.clear();
+          passwordController.clear();
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EditProfile(),
+              ));
+        }).onError((error, stackTrace) {
+          log('Error ${error.toString()}');
+        });
+      }
+    } catch (e) {
+      log('Exception caught: ${e.toString()}');
+    }
   }
 }

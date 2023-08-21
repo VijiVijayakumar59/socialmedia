@@ -1,19 +1,11 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
-import 'package:socialmedia/Data/common/colors.dart';
-import 'package:socialmedia/Presentation/Screens/home/screen/activity.dart';
-import 'package:socialmedia/Presentation/Screens/post/widget/post_details.dart';
 import 'package:socialmedia/provider/follow_state.dart';
-import 'Presentation/Screens/authentication/screen/sign_in.dart';
-import 'Presentation/Screens/home/screen/home.dart';
-import 'Presentation/Screens/profile/screen/edit_profile_screen.dart';
-import 'Presentation/Screens/profile/screen/following_screen.dart';
-import 'Presentation/Screens/profile/screen/profile.dart';
-import 'Presentation/Screens/settings/screens/settings_screen.dart';
 import 'Presentation/Screens/splash/splash.dart';
-import 'Presentation/Screens/user/screens/user_profile.dart';
 
 void main() async {
   GoogleSignIn googleSignIn = GoogleSignIn();
@@ -33,7 +25,10 @@ class SocialMedia extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<FollowState>(
           create: (context) => FollowState(),
-        )
+        ),
+        // ChangeNotifierProvider<CommentProvider>(
+        //   create: (context) => CommentProvider(),
+        // )
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

@@ -1,7 +1,5 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +37,7 @@ class _PostDetailsState extends State<PostDetails> {
   Future<void> getDataFromFirestore() async {
     String? emailId = FirebaseAuth.instance.currentUser?.email;
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('User')
+        .collection('Users')
         .where('email', isEqualTo: emailId)
         .get();
 
@@ -199,7 +197,7 @@ Future<void> addPosts(Posts postsModel, BuildContext context) async {
 
 Future<void> updatePostValueIfEmailMatches(String currentEmail) async {
   final CollectionReference collection =
-      FirebaseFirestore.instance.collection('User');
+      FirebaseFirestore.instance.collection('Users');
 
   QuerySnapshot querySnapshot =
       await collection.where('email', isEqualTo: currentEmail).get();

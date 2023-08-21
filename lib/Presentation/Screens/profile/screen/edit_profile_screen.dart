@@ -5,16 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:socialmedia/Data/common/colors.dart';
-
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:socialmedia/Data/models/profile_model.dart';
+import 'package:socialmedia/Presentation/Screens/home/screen/home.dart';
 import '../widgets/edit_widget.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
-final CollectionReference usersCollection = firestore.collection('users');
+final CollectionReference usersCollection = firestore.collection('Users');
 
 class EditProfile extends StatefulWidget {
-  const EditProfile({super.key});
+  const EditProfile({Key? key}) : super(key: key);
 
   @override
   State<EditProfile> createState() => _EditProfileState();
@@ -38,26 +38,11 @@ class _EditProfileState extends State<EditProfile> {
       appBar: AppBar(
         backgroundColor: twhitecolor,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
         title: const Text("Edit Profile"),
         actions: [
           IconButton(
-              onPressed: () async {
-                if (profileKey.currentState!.validate()) {
-                  Profile data = Profile(
-                    image: image,
-                    name: nameController.text.trim(),
-                    phone: int.parse(phoneController.text.trim()),
-                    place: locationController.text.trim(),
-                    profession: professionController.text.trim(),
-                  );
-                  await addUser(data, context);
-                }
+              onPressed: () {
+                addUser(context);
               },
               icon: const Icon(Icons.check_rounded))
         ],
@@ -118,10 +103,6 @@ class _EditProfileState extends State<EditProfile> {
                     controller: phoneController,
                     validate: validateName,
                     name: "Phone"),
-                Textfield(
-                    controller: mailController,
-                    validate: validateName,
-                    name: "mail"),
               ],
             ),
           ),
@@ -206,28 +187,32 @@ class _EditProfileState extends State<EditProfile> {
     image = downloadURL;
     return image;
   }
-}
 
-Future<void> addUser(Profile profileModel, BuildContext context) async {
-  final user = FirebaseFirestore.instance.collection('User');
-  final reference = user.doc();
-  final String email = FirebaseAuth.instance.currentUser!.email!;
-  try {
-    await reference.set({
-      'id': reference.id,
-      'email': email,
-      'image': profileModel.image,
-      'name': profileModel.name,
-      'phone': profileModel.phone,
-      'place': profileModel.place,
-      'profession': profileModel.profession,
-      'posts': 0,
-      'followers': 0,
-      'following': 0,
-    }).then((value) {
-      Navigator.of(context).pop();
-    });
-  } catch (error) {
-    log("Failed to add product: $error");
+  Future<void> addUser(BuildContext context) async {
+    try {
+      final userCollection = FirebaseFirestore.instance.collection('Users');
+      final String currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
+      final userDocument = userCollection.doc(currentUserEmail);
+      final userDetails = Profile(
+        id: FirebaseAuth.instance.currentUser?.uid,
+        email: currentUserEmail,
+        image: image,
+        name: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+        location: locationController.text.trim(),
+        profession: professionController.text.trim(),
+        followers: [],
+        following: [],
+        posts: [],
+      );
+      await userDocument.set(userDetails.toJson()).then((value) {
+        debugPrint("user document added succesfully");
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ));
+      });
+    } catch (e) {
+      debugPrint("error occured while adding user document: $e");
+    }
   }
 }

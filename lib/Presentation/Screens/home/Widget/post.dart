@@ -1,28 +1,21 @@
-// ignore_for_file: unused_local_variable
-
+// ignore_for_file: unused_local_variable, sized_box_for_whitespace
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:socialmedia/Presentation/Screens/home/Widget/show_comments.dart';
 import '../../../post_functions/post_functions.dart';
 
 class PostWidget extends StatelessWidget {
-  // final String imageUrl;
   const PostWidget({
     super.key,
-    // required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     final String? userId = FirebaseAuth.instance.currentUser?.uid;
     String? email = FirebaseAuth.instance.currentUser?.email;
-    // return ListView.builder(
-    //   // physics: NeverScrollableScrollPhysics(),
-    //   itemCount: 3,
-    //   itemBuilder: (context, index) {
     return StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Posts').snapshots(),
         builder: (context, snapshot) {
@@ -30,8 +23,6 @@ class PostWidget extends StatelessWidget {
             return const CircularProgressIndicator();
           } else if (snapshot.hasData && snapshot.data != null) {
             final List<QueryDocumentSnapshot> documents = snapshot.data!.docs;
-            // bool available = documents.isNotEmpty;
-            // if (documents.isNotEmpty) {
             return ListView.builder(
               itemCount: documents.length,
               itemBuilder: (context, index) {
@@ -39,6 +30,7 @@ class PostWidget extends StatelessWidget {
                 final name = document['username'] as String;
                 final imageUrl = document['postImage'] as String?;
                 final location = document['location'] as String?;
+                final targetEmail = document['email'] as String;
                 final likes = document['likes'].toString();
                 final description = document['description'] as String?;
                 final likedBy =
@@ -51,7 +43,8 @@ class PostWidget extends StatelessWidget {
                 final descriptionValue = description ?? '';
                 return StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
-                        .collection('User')
+                        .collection('Users')
+                        .where('email', isEqualTo: targetEmail)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -59,6 +52,7 @@ class PostWidget extends StatelessWidget {
                             snapshot.data!.docs;
                         return documents.isNotEmpty
                             ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ListTile(
                                     leading: Container(
@@ -84,13 +78,10 @@ class PostWidget extends StatelessWidget {
                                             shape: BoxShape.rectangle,
                                             image: DecorationImage(
                                               fit: BoxFit.cover,
-                                              // image: AssetImage(
-                                              //     'assets/images/post2.jpg'),
                                               image: NetworkImage(
                                                 documents[0].get(
                                                   'image',
                                                 ),
-                                                //imageUrl![0]
                                               ),
                                             ),
                                           ),
@@ -103,13 +94,6 @@ class PostWidget extends StatelessWidget {
                                       style: const TextStyle(
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    // trailing: IconButton(
-                                    //     onPressed: () {
-                                    //     },
-                                    //     icon: const Icon(
-                                    //       Icons.more_vert_rounded,
-                                    //     ),
-                                    // ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(
@@ -137,7 +121,6 @@ class PostWidget extends StatelessWidget {
                                             if (userId != null) {
                                               final isLiked =
                                                   likedBy.contains(userId);
-
                                               if (isLiked) {
                                                 likedBy.add(
                                                     userId); // Add the user ID to the likedBy list
@@ -226,6 +209,26 @@ class PostWidget extends StatelessWidget {
                                       ),
                                     ),
                                   ]),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                            builder: (context) => ShowComments(
+                                              postId: postId,
+                                              // addedComments:
+                                              //     _commentController.text.trim().split('\n'),
+                                            ),
+                                          ));
+                                        },
+                                        child: Text(
+                                          'comments',
+                                          style: TextStyle(
+                                              color: tblackcolor,
+                                              fontWeight: FontWeight.bold),
+                                        )),
+                                  ),
                                 ],
                               )
                             : Column(

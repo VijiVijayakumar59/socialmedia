@@ -1,13 +1,11 @@
 // ignore_for_file: sort_child_properties_last
 
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/profile/screen/followers_screen.dart';
-import 'package:socialmedia/Presentation/Screens/profile/screen/following_screen.dart';
-import 'package:socialmedia/Presentation/Screens/search/screen/search.dart';
-
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/profile_values.dart';
 import 'edit_profile_screen.dart';
@@ -27,20 +25,44 @@ List<String> imageUrls = [
   'assets/images/post4.jpeg',
 ];
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    log("currentuser id : ${FirebaseAuth.instance.currentUser?.uid}");
+  }
+
+  @override
   Widget build(BuildContext context) {
-    String email = FirebaseAuth.instance.currentUser!.email!;
+    String id = FirebaseAuth.instance.currentUser!.uid;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text(
-            "_Selena_Gomez",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-          ),
+          title: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Users')
+                  .where('id', isEqualTo: id)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                  final data = snapshot.data!.docs.first;
+                  return Text(
+                    data['name'],
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 22),
+                  );
+                } else {
+                  return const Text("Username");
+                }
+              }),
           actions: [
             IconButton(
               onPressed: () {
@@ -58,15 +80,15 @@ class ProfileScreen extends StatelessWidget {
             children: [
               StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('User')
-                      .where('email', isEqualTo: email)
+                      .collection('Users')
+                      .where('id', isEqualTo: id)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
-                      final List<DocumentSnapshot> documents =
-                          snapshot.data!.docs;
+                      final DocumentSnapshot data = snapshot.data!.docs.first;
+                      // print("firestore data: ${documents[0].get('followers')}");
                       // final DocumentSnapshot userSnap = filteredUser[0];
-                      bool available = documents.isNotEmpty;
+
                       return Column(
                         children: [
                           Row(
@@ -77,9 +99,8 @@ class ProfileScreen extends StatelessWidget {
                               ),
                               CircleAvatar(
                                 radius: 48,
-                                backgroundImage: NetworkImage(available
-                                    ? documents[0].get('image')
-                                    : 'https://www.cornwallbusinessawards.co.uk/wp-content/uploads/2017/11/dummy450x450.jpg'),
+                                backgroundImage: NetworkImage(data['image'] ??
+                                    'https://www.cornwallbusinessawards.co.uk/wp-content/uploads/2017/11/dummy450x450.jpg'),
                               ),
                               SizedBox(
                                 width: MediaQuery.of(context).size.width * 0.12,
@@ -87,14 +108,12 @@ class ProfileScreen extends StatelessWidget {
                             ],
                           ),
                           Text(
-                            available ? documents[0].get('name') : "Username",
+                            data['name'] ?? "Username",
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           Text(
-                            available
-                                ? documents[0].get('profession')
-                                : "Profession",
+                            data['profession'] ?? "Profession",
                           ),
                           Row(
                             children: [
@@ -102,47 +121,35 @@ class ProfileScreen extends StatelessWidget {
                                 width: MediaQuery.of(context).size.width * 0.22,
                               ),
                               ProfileFollowing(
-                                  value: available
-                                      ? documents[0].get('posts').toString()
-                                      : '0',
+                                  value: data['posts'].length.toString(),
                                   titles: "Posts"),
                               InkWell(
                                 onTap: () {
                                   Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => FollowersScreen(),
+                                    builder: (context) =>
+                                        const FollowersScreen(),
                                   ));
                                 },
                                 child: ProfileFollowing(
-                                    value: available
-                                        ? documents[0]
-                                            .get('followers')
-                                            .toString()
-                                        : '0',
+                                    value: data['followers'].length.toString(),
                                     titles: "Followers"),
                               ),
                               InkWell(
                                 onTap: () {
-                                  Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => FollowingScreen(
-                                      name: documents[0].get('name').toString(),
-                                      image:
-                                          documents[0].get('image').toString(),
-                                      profession: documents[0]
-                                          .get('profession')
-                                          .toString(),
-                                      followers: documents[0].get('followers'),
-                                      following: documents[0].get('following'),
-                                      email: email,
-                                      id: documents[0].get('id').toString(),
-                                    ),
-                                  ));
+                                  // Navigator.of(context).push(MaterialPageRoute(
+                                  //   builder: (context) => FollowingScreen(
+                                  //     name: data['name'].toString(),
+                                  //     image: data['image'].toString(),
+                                  //     profession: data['profession'].toString(),
+                                  //     followers: data['followers'],
+                                  //     following: data['following'],
+                                  //     email: data["email"],
+                                  //     id: data['posts'].toString(),
+                                  //   ),
+                                  // ));
                                 },
                                 child: ProfileFollowing(
-                                    value: available
-                                        ? documents[0]
-                                            .get('following')
-                                            .toString()
-                                        : '0',
+                                    value: data['following'].length.toString(),
                                     titles: "Following"),
                               ),
                             ],
@@ -162,12 +169,12 @@ class ProfileScreen extends StatelessWidget {
                 },
                 style: ElevatedButton.styleFrom(
                   splashFactory: NoSplash.splashFactory,
+                  backgroundColor: twhitecolor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(25),
                   ),
                   elevation: 0,
                   side: BorderSide(color: Colors.grey.shade300),
-                  primary: twhitecolor,
                   minimumSize: const Size.fromHeight(35),
                 ),
                 child: Text(
@@ -186,7 +193,7 @@ class ProfileScreen extends StatelessWidget {
               StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Posts')
-                      .where('email', isEqualTo: email)
+                      .where('email', isEqualTo: id)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
@@ -209,7 +216,6 @@ class ProfileScreen extends StatelessWidget {
                             return GestureDetector(
                               onTap: () {},
                               child: Container(
-                                // ignore: sort_child_properties_last
                                 // child: Image.asset(
                                 //   imageUrls[index],
                                 //   fit: BoxFit.cover,
@@ -226,7 +232,7 @@ class ProfileScreen extends StatelessWidget {
                         ),
                       );
                     }
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }),
             ],
           ),
