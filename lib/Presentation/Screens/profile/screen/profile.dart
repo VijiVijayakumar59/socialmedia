@@ -6,9 +6,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:socialmedia/Presentation/Screens/profile/screen/followers_screen.dart';
+import 'package:socialmedia/Presentation/Screens/profile/widgets/edit_profile_widget.dart';
 import '../../settings/screens/settings_screen.dart';
 import '../widgets/profile_values.dart';
-import 'edit_profile_screen.dart';
+import 'complete_profile_screen.dart';
 
 List<String> imageUrls = [
   'assets/images/post.jpg',
@@ -130,9 +131,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         const FollowersScreen(),
                                   ));
                                 },
-                                child: ProfileFollowing(
-                                    value: data['followers'].length.toString(),
-                                    titles: "Followers"),
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => FollowersScreen(),
+                                      ),
+                                    );
+                                  },
+                                  child: ProfileFollowing(
+                                      value:
+                                          data['followers'].length.toString(),
+                                      titles: "Followers"),
+                                ),
                               ),
                               InkWell(
                                 onTap: () {

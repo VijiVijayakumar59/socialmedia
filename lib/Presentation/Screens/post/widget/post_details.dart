@@ -77,13 +77,12 @@ class _PostDetailsState extends State<PostDetails> {
                 if (postKey.currentState!.validate()) {
                   Posts data = Posts(
                     location: locationController.text.trim(),
-                    username: userName,
                     description: captionController.text.trim(),
-                    email: emailController.text.trim(),
                     postId: postIdController.text.trim(),
                     postImage: widget.imageUrl,
-                    likedBy: [],
-                    likes: 0,
+                    likes: [],
+                    postedBy: FirebaseAuth.instance.currentUser?.uid,
+                    comments: [],
                   );
                   await addPosts(data, context);
                   log(widget.imageUrl);
@@ -178,14 +177,13 @@ Future<void> addPosts(Posts postsModel, BuildContext context) async {
   final String email = FirebaseAuth.instance.currentUser!.email!;
   try {
     await reference.set({
-      'likedBy': postsModel.likedBy,
       'description': postsModel.description,
-      'email': email,
-      'likes': 0,
+      'postedBy': postsModel.postedBy,
+      'likes': postsModel.likes,
       'location': postsModel.location,
       'postId': reference,
       'postImage': postsModel.postImage,
-      'username': postsModel.username,
+      'comments': postsModel.comments,
     }).then((value) async {
       await updatePostValueIfEmailMatches(email);
       Navigator.of(context).pop();

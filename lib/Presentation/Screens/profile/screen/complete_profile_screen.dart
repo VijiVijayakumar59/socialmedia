@@ -13,11 +13,15 @@ import '../widgets/edit_widget.dart';
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 final CollectionReference usersCollection = firestore.collection('Users');
 
-class EditProfile extends StatefulWidget {
-  const EditProfile({Key? key}) : super(key: key);
+class SetUpProfile extends StatefulWidget {
+  final bool isEdit;
+  const SetUpProfile({
+    Key? key,
+    this.isEdit = false,
+  }) : super(key: key);
 
   @override
-  State<EditProfile> createState() => _EditProfileState();
+  State<SetUpProfile> createState() => _SetUpProfileState();
 }
 
 TextEditingController nameController = TextEditingController();
@@ -26,7 +30,7 @@ TextEditingController locationController = TextEditingController();
 TextEditingController phoneController = TextEditingController();
 TextEditingController mailController = TextEditingController();
 
-class _EditProfileState extends State<EditProfile> {
+class _SetUpProfileState extends State<SetUpProfile> {
   final profileKey = GlobalKey<FormState>();
   File? galleryFile;
   String? image;
@@ -34,6 +38,7 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    String id = FirebaseAuth.instance.currentUser!.uid;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: twhitecolor,
@@ -42,7 +47,11 @@ class _EditProfileState extends State<EditProfile> {
         actions: [
           IconButton(
               onPressed: () {
-                addUser(context);
+                if (widget.isEdit) {
+                  updateUser(context);
+                } else {
+                  addUser(context);
+                }
               },
               icon: const Icon(Icons.check_rounded))
         ],
@@ -90,7 +99,7 @@ class _EditProfileState extends State<EditProfile> {
                 Textfield(
                     controller: nameController,
                     validate: validateName,
-                    name: "First Name"),
+                    name: "Name"),
                 Textfield(
                     controller: professionController,
                     validate: validateName,
@@ -185,10 +194,44 @@ class _EditProfileState extends State<EditProfile> {
     String downloadURL = await ref.getDownloadURL();
     log(downloadURL);
     image = downloadURL;
+    FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser?.email)
+        .update({"image": image});
+    // debugPrint("image uploading:$image");
     return image;
   }
 
   Future<void> addUser(BuildContext context) async {
+    try {
+      final userCollection = FirebaseFirestore.instance.collection('Users');
+      final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+      final userDocument = userCollection.doc(currentUserId);
+      final userDetails = Profile(
+        id: FirebaseAuth.instance.currentUser?.uid,
+        email: currentUserId,
+        image: image,
+        name: nameController.text.trim(),
+        phone: phoneController.text.trim(),
+        location: locationController.text.trim(),
+        profession: professionController.text.trim(),
+        followers: [],
+        following: [],
+        posts: [],
+      );
+      await userDocument.set(userDetails.toJson()).then((value) {
+        debugPrint("user document added succesfully");
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
+        ));
+      });
+    } catch (e) {
+      debugPrint("error occured while adding user document: $e");
+    }
+  }
+
+  Future<void> updateUser(BuildContext context) async {
+    debugPrint("image:$image");
     try {
       final userCollection = FirebaseFirestore.instance.collection('Users');
       final String currentUserEmail = FirebaseAuth.instance.currentUser!.email!;
@@ -205,8 +248,8 @@ class _EditProfileState extends State<EditProfile> {
         following: [],
         posts: [],
       );
-      await userDocument.set(userDetails.toJson()).then((value) {
-        debugPrint("user document added succesfully");
+      await userDocument.update(userDetails.toJson()).then((value) {
+        debugPrint("user document updated succesfully");
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => const HomeScreen(),
         ));

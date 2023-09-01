@@ -25,7 +25,7 @@ class Profile {
   Profile({
     this.email,
     this.id,
-    required this.image,
+    this.image,
     required this.name,
     required this.phone,
     required this.location,

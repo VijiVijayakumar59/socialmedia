@@ -1,10 +1,11 @@
 // ignore_for_file: deprecated_member_use, avoid_print
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:socialmedia/Presentation/Screens/authentication/screen/sign_in.dart';
 import 'package:socialmedia/Presentation/Screens/home/screen/home.dart';
-import 'package:socialmedia/Presentation/Screens/profile/screen/edit_profile_screen.dart';
+import 'package:socialmedia/Presentation/Screens/profile/screen/complete_profile_screen.dart';
 import 'package:socialmedia/Presentation/services/firebase_services.dart';
 import '../../../../Data/common/colors.dart';
 
@@ -299,10 +300,13 @@ class _SignUpPageState extends State<SignUpPage> {
           emailController.clear();
           confirmpasswordController.clear();
           passwordController.clear();
+          FirebaseFirestore.instance
+              .collection("Users")
+              .doc(FirebaseAuth.instance.currentUser?.uid);
           Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const EditProfile(),
+                builder: (context) => const SetUpProfile(),
               ));
         }).onError((error, stackTrace) {
           log('Error ${error.toString()}');

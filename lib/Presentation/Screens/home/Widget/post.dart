@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:socialmedia/Data/common/colors.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:socialmedia/Presentation/Screens/home/Widget/show_comments.dart';
-import '../../../post_functions/post_functions.dart';
+
+import '../../../firebase_functions/post_functions.dart';
 
 class PostWidget extends StatelessWidget {
   const PostWidget({
@@ -27,15 +28,13 @@ class PostWidget extends StatelessWidget {
               itemCount: documents.length,
               itemBuilder: (context, index) {
                 final document = documents[index];
-                final name = document['username'] as String;
                 final imageUrl = document['postImage'] as String?;
                 final location = document['location'] as String?;
-                final targetEmail = document['email'] as String;
-                final likes = document['likes'].toString();
+                final postedBy = document['postedBy'] as String;
+                final likes = document['likes'].length.toString();
                 final description = document['description'] as String?;
-                final likedBy =
-                    (document['likedBy'] as List<dynamic>).cast<String>();
                 final postId = document.id;
+                final comments = document['comments'].length.toString();
 
                 final imageUrlValue = imageUrl ?? '';
                 final locationValue = location ?? '';
@@ -44,13 +43,13 @@ class PostWidget extends StatelessWidget {
                 return StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('Users')
-                        .where('email', isEqualTo: targetEmail)
+                        .where('id', isEqualTo: postedBy)
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        final List<DocumentSnapshot> documents =
-                            snapshot.data!.docs;
-                        return documents.isNotEmpty
+                        final documents = snapshot.data?.docs.first.data()
+                            as Map<String, dynamic>;
+                        return documents != null
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -79,16 +78,14 @@ class PostWidget extends StatelessWidget {
                                             image: DecorationImage(
                                               fit: BoxFit.cover,
                                               image: NetworkImage(
-                                                documents[0].get(
-                                                  'image',
-                                                ),
+                                                documents["image"] ?? '',
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                    title: Text(name),
+                                    title: Text(documents['name'] ?? ' '),
                                     subtitle: Text(
                                       location ?? '',
                                       style: const TextStyle(
@@ -112,72 +109,72 @@ class PostWidget extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  ListTile(
-                                    leading: Wrap(
-                                      spacing: 10,
-                                      children: [
-                                        IconButton(
-                                          onPressed: () async {
-                                            if (userId != null) {
-                                              final isLiked =
-                                                  likedBy.contains(userId);
-                                              if (isLiked) {
-                                                likedBy.add(
-                                                    userId); // Add the user ID to the likedBy list
+                                  // ListTile(
+                                  //   leading: Wrap(
+                                  //     spacing: 10,
+                                  //     children: [
+                                  //       IconButton(
+                                  //         onPressed: () async {
+                                  //           if (userId != null) {
+                                  //             final isLiked =
+                                  //                 likedBy.contains(userId);
+                                  //             if (isLiked) {
+                                  //               likedBy.add(
+                                  //                   userId); // Add the user ID to the likedBy list
 
-                                                // User has already liked, remove the like
-                                                await FirebaseFirestore.instance
-                                                    .collection('Posts')
-                                                    .doc(postId)
-                                                    .update({
-                                                  'likes':
-                                                      FieldValue.increment(-1),
-                                                  'likedBy':
-                                                      FieldValue.arrayRemove(
-                                                          [userId]),
-                                                });
-                                              } else {
-                                                // User has not liked, add the like
-                                                await FirebaseFirestore.instance
-                                                    .collection('Posts')
-                                                    .doc(postId)
-                                                    .update({
-                                                  'likes':
-                                                      FieldValue.increment(1),
-                                                  'likedBy':
-                                                      FieldValue.arrayUnion(
-                                                          [userId]),
-                                                });
-                                              }
-                                            }
-                                          },
-                                          icon: Icon(
-                                            likedBy.contains(userId)
-                                                ? Icons.favorite
-                                                : Icons.favorite_border,
-                                            size: 32,
-                                            color: likedBy.contains(userId)
-                                                ? maincolor
-                                                : Colors.grey,
-                                          ),
-                                        ),
-                                        InkWell(
-                                          onTap: () {
-                                            showCommentBottomSheet(
-                                                context, postId);
-                                          },
-                                          child: SvgPicture.asset(
-                                            "assets/images/comment.svg",
-                                            width: 33,
-                                          ),
-                                        ),
-                                        SvgPicture.asset(
-                                          "assets/images/share.svg",
-                                          width: 28,
-                                        )
-                                      ],
-                                    ),
-                                  ),
+                                  //               // User has already liked, remove the like
+                                  //               await FirebaseFirestore.instance
+                                  //                   .collection('Posts')
+                                  //                   .doc(postId)
+                                  //                   .update({
+                                  //                 'likes':
+                                  //                     FieldValue.increment(-1),
+                                  //                 'likedBy':
+                                  //                     FieldValue.arrayRemove(
+                                  //                         [userId]),
+                                  //               });
+                                  //             } else {
+                                  //               // User has not liked, add the like
+                                  //               await FirebaseFirestore.instance
+                                  //                   .collection('Posts')
+                                  //                   .doc(postId)
+                                  //                   .update({
+                                  //                 'likes':
+                                  //                     FieldValue.increment(1),
+                                  //                 'likedBy':
+                                  //                     FieldValue.arrayUnion(
+                                  //                         [userId]),
+                                  //               });
+                                  //             }
+                                  //           }
+                                  //         },
+                                  //         icon: Icon(
+                                  //           likedBy.contains(userId)
+                                  //               ? Icons.favorite
+                                  //               : Icons.favorite_border,
+                                  //           size: 32,
+                                  //           color: likedBy.contains(userId)
+                                  //               ? maincolor
+                                  //               : Colors.grey,
+                                  //         ),
+                                  //       ),
+                                  //       InkWell(
+                                  //         onTap: () {
+                                  //           showCommentBottomSheet(
+                                  //               context, postId);
+                                  //         },
+                                  //         child: SvgPicture.asset(
+                                  //           "assets/images/comment.svg",
+                                  //           width: 33,
+                                  //         ),
+                                  //       ),
+                                  //       SvgPicture.asset(
+                                  //         "assets/images/share.svg",
+                                  //         width: 28,
+                                  //       )
+                                  //     ],
+                                  //   ),
+                                  // ),
                                   Row(children: [
                                     Padding(
                                       padding:

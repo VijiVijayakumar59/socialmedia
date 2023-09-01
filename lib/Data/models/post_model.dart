@@ -1,31 +1,30 @@
 class Posts {
-  final String? username;
+  final String? postedBy;
   final String? location;
   final String? description;
-  final String? email;
-  final int? likes;
+
   final String? postId;
   final String? postImage;
-  final List<String>? likedBy;
+  final List<String>? likes;
+  final List<String>? comments;
+  //postid,postedby,caption,likes[],comments[],createdat
   Posts.fromJson(Map<String, Object?> json)
       : this(
-          username: json['username']! as String,
+          postedBy: json['postedBy']! as String,
           location: json['location']! as String,
           description: json['description']! as String,
-          email: json['email']! as String,
-          likes: json['likes']! as int,
+          comments: json['comments']! as List<String>,
           postId: json['postId']! as String,
           postImage: json['postImage']! as String,
-          likedBy: json['likedBy']! as List<String>,
+          likes: json['likes']! as List<String>,
         );
   Posts({
-    required this.username,
+    this.postId,
+    this.comments,
     this.location,
     required this.description,
-    required this.email,
-    this.likes,
-    required this.postId,
+    required this.postedBy,
     required this.postImage,
-    this.likedBy,
+    this.likes,
   });
 }
